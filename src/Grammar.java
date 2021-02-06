@@ -22,6 +22,10 @@ public class Grammar {
         return productions.get(index);
     }
 
+    public Production getStartProduction() {
+        return getProductionsByNotTerminal(getStartSymbol()).get(0);
+    }
+
     public Integer getProductionIndex(Production production) {
         return productions.indexOf(production);
     }
@@ -85,7 +89,12 @@ class Production {
 
     @Override
     public String toString() {
-        return lNotTerminal.getValue() + " -> " + rSymbols.stream().map(Symbol::getValue).collect(Collectors.joining(" "));
+        return lNotTerminal.getValue() + " -> " + rSymbols.stream().map(symbol -> {
+            if (symbol.isTerminal()) {
+                return DomainTagCalculator.getTerminalViewByTagName(symbol.getValue());
+            }
+            return symbol.getValue();
+        }).collect(Collectors.joining(" "));
     }
 
     public boolean isEpsilonProduction() {

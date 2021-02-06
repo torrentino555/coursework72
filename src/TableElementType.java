@@ -1,11 +1,3 @@
-public class GenerateTableSLR {
-    // На вход подается расширенная грамматика G
-    // Добавлено правило S' -> S, где S - стартовое правило, чтобы понять, когда нужно завершить анализ
-    public void generate(Grammar G) {
-
-    }
-}
-
 class TableElementType {
     private static final String SHIFT_TYPE = "shift";
     private static final String REDUCE_TYPE = "reduce";
@@ -54,6 +46,10 @@ class TableElementType {
     @Override
     public String toString() {
         String r = state == null ? "?" : state.toString();
+//        // TODO: удалить, это для отладки
+//        List<Integer> map = new ArrayList<>(List.of(0, 4, 5, 2, 1, 3, 8, 7, 6, 11, 10, 9));
+//        String r = state == null ? "?" : (type.equals(REDUCE_TYPE) ? state : map.get(state)).toString();
+//        //
         return switch (type) {
             case SHIFT_TYPE -> "s" + r;
             case REDUCE_TYPE -> "r" + r;

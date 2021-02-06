@@ -2,10 +2,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GenerateLRMachine {
-    private Grammar grammar;
-    private List<Map<Symbol, Integer>> relations = new ArrayList<>();
-    private Map<Integer, Map<String, TableElementType>> action = new HashMap<>();
-    private Map<Integer, Map<String, Integer>> goTo = new HashMap<>();
+    private final Grammar grammar;
+    private final List<Map<Symbol, Integer>> relations = new ArrayList<>();
+    private final Map<Integer, Map<String, TableElementType>> action = new HashMap<>();
+    private final Map<Integer, Map<String, Integer>> goTo = new HashMap<>();
 
     // На вход подается расширенная грамматика
     public GenerateLRMachine(Grammar grammar) {
@@ -33,25 +33,30 @@ public class GenerateLRMachine {
 
         GenerateLRMachine generateLRMachine = new GenerateLRMachine(grammar1);
         generateLRMachine.generateActionAndGoTo();
-        generateLRMachine.printActionMap();
-        generateLRMachine.printGoToMap();
-//        System.out.println(generateLRMachine.action);
-//        System.out.println(generateLRMachine.goTo);
+
     }
 
     public void printActionMap() {
         StringBuilder buffer = new StringBuilder();
         List<Symbol> terminals = grammar.getDeclarations().stream().filter(Symbol::isTerminal).collect(Collectors.toList());
+//        // TODO: удалить, это для отладки
+//        List<Symbol> terminals = new ArrayList<>(List.of(Symbol.createTerminal("id"), Symbol.createTerminal("+"), Symbol.createTerminal("*"), Symbol.createTerminal("("), Symbol.createTerminal(")")));
+//        List<Integer> reverseMap = new ArrayList<>(List.of(0, 4, 3, 5, 1, 2, 8, 7, 6, 11, 10, 9));
+//        //
         terminals.add(Symbol.createEndTerminal());
         buffer.append("    ");
         for (Symbol s : terminals) {
-            buffer.append(s.getValue()).append("  ");
+            buffer.append(s.toString()).append("  ");
         }
         buffer.append("\n");
         for (int i = 0; i < action.size(); i++) {
             buffer.append(i > 9 ? i : i + " ").append(": ");
             for (Symbol s: terminals) {
-                buffer.append(action.get(i).containsKey(s.getValue()) ? action.get(i).get(s.getValue()).toString() + " " : "   ");
+                buffer.append(action.get(i).containsKey(s.toString()) ? action.get(i).get(s.toString()).toString() + " " : "   ");
+//                // TODO: удалить, это для отладки
+//                Integer j = reverseMap.get(i);
+//                buffer.append(action.get(j).containsKey(s.toString()) ? action.get(j).get(s.toString()).toString() + " " : "   ");
+//                //
             }
             buffer.append("\n");
         }
@@ -61,16 +66,17 @@ public class GenerateLRMachine {
     public void printGoToMap() {
         StringBuilder buffer = new StringBuilder();
         List<Symbol> notTerminals = grammar.getDeclarations().stream().filter(Symbol::isNotTerminal).collect(Collectors.toList());
+//        List<Symbol> notTerminals = new ArrayList<>(List.of(Symbol.createNotTerminal("E"), Symbol.createNotTerminal("T"), Symbol.createNotTerminal("F")));
         buffer.append("    ");
         for (Symbol s : notTerminals) {
-            buffer.append(s.getValue()).append(s.getValue().length() == 2 ? " " : "  ");
+            buffer.append(s.toString()).append(s.toString().length() == 2 ? " " : "  ");
         }
         buffer.append("\n");
         for (int i = 0; i < goTo.size(); i++) {
             buffer.append(i > 9 ? i : i + " ").append(": ");
             for (Symbol s: notTerminals) {
-                buffer.append(goTo.get(i).containsKey(s.getValue()) ?
-                        (goTo.get(i).get(s.getValue()) > 9 ? goTo.get(i).get(s.getValue()) : goTo.get(i).get(s.getValue()) + " ")
+                buffer.append(goTo.get(i).containsKey(s.toString()) ?
+                        (goTo.get(i).get(s.toString()) > 9 ? goTo.get(i).get(s.toString()) : goTo.get(i).get(s.toString()) + " ")
                                 + " " : "   ");
             }
             buffer.append("\n");
@@ -78,11 +84,19 @@ public class GenerateLRMachine {
         System.out.println(buffer.toString());
     }
 
+    public String printItems(List<ItemsSet> itemsSets) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < itemsSets.size(); i++) {
+            stringBuilder.append(i).append(":").append(itemsSets.get(i));
+        }
+        return stringBuilder.toString();
+    }
+
     public void generateActionAndGoTo() {
-        List<SetOfItems> machine = items();
+        List<ItemsSet> machine = items();
         FirstAndFollowGenerator firstAndFollowGenerator = new FirstAndFollowGenerator(grammar);
         if (ProdOrDebug.isDebug)
-            System.out.println(machine);
+            System.out.println(printItems(machine));
 
         for (int i = 0; i < machine.size(); i++) {
             action.put(i, new HashMap<>());
@@ -93,9 +107,9 @@ public class GenerateLRMachine {
             for (ProductionWithItem production : list) {
                 Symbol symbolAfterPoint = production.getSymbolAfterPoint();
                 TableElementType elementType = TableElementType.createShift(relations.get(i).get(symbolAfterPoint));
-                if (action.get(i).containsKey(symbolAfterPoint.getValue()))
+                if (action.get(i).containsKey(symbolAfterPoint.toString()))
                     throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                action.get(i).put(symbolAfterPoint.getValue(), elementType);
+                action.get(i).put(symbolAfterPoint.toString(), elementType);
             }
 
             // Пункт 2.б
@@ -107,9 +121,9 @@ public class GenerateLRMachine {
                 Integer reduceProductionIndex = grammar.getProductionIndex(production.getProduction());
                 Set<Symbol> follow = firstAndFollowGenerator.calcFollow(production.getProduction().getLNotTerminal());
                 for (Symbol symbol : follow) {
-                    if (action.get(i).containsKey(symbol.getValue()))
+                    if (action.get(i).containsKey(symbol.toString()))
                         throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                    action.get(i).put(symbol.getValue(), TableElementType.createReduce(reduceProductionIndex));
+                    action.get(i).put(symbol.toString(), TableElementType.createReduce(reduceProductionIndex));
                 }
             }
 
@@ -118,67 +132,71 @@ public class GenerateLRMachine {
                     productions.stream().filter(p -> p.getProduction().getLNotTerminal().equals(grammar.getStartSymbol()) && p.itemAtTheEnd())
                     .collect(Collectors.toList());
             if (ps.size() > 0) {
-                if (action.get(i).containsKey(Symbol.createEndTerminal().getValue()))
+                if (action.get(i).containsKey(Symbol.createEndTerminal().toString()))
                     throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                action.get(i).put(Symbol.createEndTerminal().getValue(), TableElementType.createAccept());
+                action.get(i).put(Symbol.createEndTerminal().toString(), TableElementType.createAccept());
             }
 
             List<Symbol> keySet = relations.get(i).keySet().stream().filter(Symbol::isNotTerminal).collect(Collectors.toList());
             for (Symbol s : keySet) {
-                goTo.get(i).put(s.getValue(), relations.get(i).get(s));
+                goTo.get(i).put(s.toString(), relations.get(i).get(s));
             }
         }
     }
 
-    public List<SetOfItems> items() {
-        SetOfItems startSetOfItems = new SetOfItems();
-        startSetOfItems.addProduction(new ProductionWithItem(grammar.getProductionsByNotTerminal(grammar.getStartSymbol()).get(0)));
-        List<SetOfItems> C = new ArrayList<>(List.of(closure(startSetOfItems)));
-        relations.add(new HashMap<>());
+    public List<ItemsSet> items() {
+        ItemsSet basicState = new ItemsSet(grammar.getStartProduction());
+        List<ItemsSet> states = new ArrayList<>(List.of(closure(basicState)));
 
-        Set<SetOfItems> alreadyDone = new HashSet<>();
+        Set<ItemsSet> alreadyDone = new HashSet<>();
         int oldSize, currentSize;
         do {
-            oldSize = C.size();
-            List<SetOfItems> newC = new ArrayList<>(C);
-            for (int i = 0; i < C.size(); i++) {
-                SetOfItems setOfItems = C.get(i);
-                if (alreadyDone.contains(setOfItems)) {
+            oldSize = states.size();
+            List<ItemsSet> newStates = new ArrayList<>(states);
+            for (int i = 0; i < states.size(); i++) {
+                ItemsSet state = states.get(i);
+                if (alreadyDone.contains(state)) {
                     continue;
                 }
 
                 for (Symbol s : grammar.getDeclarations()) {
-                    SetOfItems nextI = goTo(setOfItems, s);
-                    if (nextI.getSet().size() != 0 && !newC.contains(nextI)) {
-                        relations.get(i).put(s, newC.size());
-                        relations.add(new HashMap<>());
-                        newC.add(nextI);
+                    ItemsSet nextI = goTo(state, s);
+                    if (nextI.getSet().size() != 0) {
+                        while (i >= relations.size()) {
+                            relations.add(new HashMap<>());
+                        }
+                        if (!newStates.contains(nextI)) {
+                            relations.get(i).put(s, newStates.size());
+                            newStates.add(nextI);
+                        } else {
+                            relations.get(i).put(s, newStates.indexOf(nextI));
+                        }
                     }
                 }
 
-                alreadyDone.add(setOfItems);
+                alreadyDone.add(state);
             }
-            C = newC;
-            currentSize = C.size();
+            states = newStates;
+            currentSize = states.size();
         } while (oldSize < currentSize);
-        return C;
+        return states;
     }
 
-    public SetOfItems goTo(SetOfItems I, Symbol X) {
+    public ItemsSet goTo(ItemsSet I, Symbol X) {
         Set<ProductionWithItem> newSet = I.getSet().stream().filter(production -> production.getSymbolAfterPoint().equals(X)).collect(Collectors.toSet());
-        return closure(new SetOfItems(newSet.stream().map(ProductionWithItem::incrementItem).collect(Collectors.toSet())));
+        return closure(new ItemsSet(newSet.stream().map(ProductionWithItem::incrementItem).collect(Collectors.toSet())));
     }
 
 
 
-    public SetOfItems closure(SetOfItems I) {
-        SetOfItems setOfItems = new SetOfItems(I);
+    public ItemsSet closure(ItemsSet I) {
+        ItemsSet itemsSet = new ItemsSet(I);
         Set<ProductionWithItem> alreadyDone = new HashSet<>();
         int oldSize, currentSize;
         do {
-            oldSize = setOfItems.getSet().size();
-            Set<ProductionWithItem> newSet = new HashSet<>(setOfItems.getSet());
-            for (ProductionWithItem elementFromJ : setOfItems.getSet()) {
+            oldSize = itemsSet.getSet().size();
+            Set<ProductionWithItem> newSet = new HashSet<>(itemsSet.getSet());
+            for (ProductionWithItem elementFromJ : itemsSet.getSet()) {
                 if (alreadyDone.contains(elementFromJ)) {
                     continue;
                 }
@@ -191,26 +209,38 @@ public class GenerateLRMachine {
 
                 alreadyDone.add(elementFromJ);
             }
-            setOfItems.setSet(newSet);
-            currentSize = setOfItems.getSet().size();
+            itemsSet.setSet(newSet);
+            currentSize = itemsSet.getSet().size();
         } while (oldSize < currentSize);
-        return setOfItems;
+        return itemsSet;
+    }
+
+    public Map<Integer, Map<String, TableElementType>> getAction() {
+        return action;
+    }
+
+    public Map<Integer, Map<String, Integer>> getGoTo() {
+        return goTo;
     }
 }
 
-class SetOfItems {
+class ItemsSet {
     private Set<ProductionWithItem> set;
 
-    public SetOfItems() {
+    public ItemsSet() {
         set = new HashSet<>();
     }
 
-    public SetOfItems(Set<ProductionWithItem> set) {
+    public ItemsSet(Production production) {
+        set = new HashSet<>(List.of(new ProductionWithItem(production)));
+    }
+
+    public ItemsSet(Set<ProductionWithItem> set) {
         this.set = set;
     }
 
-    public SetOfItems(SetOfItems setOfItems) {
-        this.set = new HashSet<>(setOfItems.getSet());
+    public ItemsSet(ItemsSet itemsSet) {
+        this.set = new HashSet<>(itemsSet.getSet());
     }
 
     public Set<ProductionWithItem> getSet() {
@@ -227,16 +257,20 @@ class SetOfItems {
 
     @Override
     public String toString() {
-        return "SetOfItems{" +
-                "set=" + set +
-                '}';
+        StringBuilder result = new StringBuilder();
+        result.append("\nСостояние автомата {\n");
+        set.stream()
+                .sorted(Comparator.comparing(production -> production.getProduction().getLNotTerminal().toString()))
+                .forEach(production -> result.append("\t").append(production).append("\n"));
+        result.append("}\n");
+        return result.toString();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SetOfItems that = (SetOfItems) o;
+        ItemsSet that = (ItemsSet) o;
         return Objects.equals(set, that.set);
     }
 
@@ -247,7 +281,7 @@ class SetOfItems {
 }
 
 class ProductionWithItem {
-    private Production production;
+    private final Production production;
     private int item = 0;
 
     public ProductionWithItem(Production production) {
@@ -278,6 +312,10 @@ class ProductionWithItem {
         return item == production.getRSymbols().size();
     }
 
+    public boolean isEpsilonProduction() {
+        return production.getRSymbols().size() != 0 && production.getRSymbols().get(0).isEpsilon();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -294,14 +332,14 @@ class ProductionWithItem {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(production.getLNotTerminal().getValue());
+        stringBuilder.append(production.getLNotTerminal().toString());
         stringBuilder.append(" -> ");
         for (int i = 0; i < production.getRSymbols().size(); i++) {
             if (item == i) {
                 stringBuilder.append(" .");
             }
             stringBuilder.append(" ");
-            stringBuilder.append(production.getRSymbols().get(i).getValue());
+            stringBuilder.append(production.getRSymbols().get(i).toString());
         }
         if (item == production.getRSymbols().size()) {
             stringBuilder.append(" .");

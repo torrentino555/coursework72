@@ -5,11 +5,10 @@ public class Symbol {
     private static final String TERMINAL_TYPE = "terminal";
     private static final String NOT_TERMINAL_TYPE = "not_terminal";
     private static final String EPSILON_TYPE = "epsilon";
-    private static final String END_SYMBOL = "$";
     public static final Symbol EPSILON = createEpsilon();
 
-    private String type;
-    private String value;
+    private final String type;
+    private final String value;
 
     private Symbol(String type) {
         this.type = type;
@@ -34,7 +33,7 @@ public class Symbol {
     }
 
     public static Symbol createEndTerminal() {
-        return createTerminal(END_SYMBOL);
+        return createTerminal(DomainTagCalculator.EOF.name());
     }
 
     @Override
@@ -52,13 +51,7 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return "Symbol{" +
-                "type='" + type + '\'' +
-                (value == null ?
-                        "" :
-                        ", value='" + value + '\'' +
-                                '}'
-                );
+        return type.equals(EPSILON_TYPE) ? "EPSILON" : value;
     }
 
     public boolean isTerminal() {
