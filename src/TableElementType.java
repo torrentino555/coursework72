@@ -5,6 +5,7 @@ class TableElementType {
 
     private String type;
     private Integer state;
+    private Production production;
 
     public TableElementType(String type) {
         this.type = type;
@@ -15,12 +16,18 @@ class TableElementType {
         this.state = state;
     }
 
+    public TableElementType(String type, Integer state, Production production) {
+        this.type = type;
+        this.state = state;
+        this.production = production;
+    }
+
     public static TableElementType createShift(Integer state) {
         return new TableElementType(SHIFT_TYPE, state);
     }
 
-    public static TableElementType createReduce(Integer state) {
-        return new TableElementType(REDUCE_TYPE, state);
+    public static TableElementType createReduce(Integer state, Production production) {
+        return new TableElementType(REDUCE_TYPE, state, production);
     }
 
     public static TableElementType createAccept() {
@@ -41,6 +48,10 @@ class TableElementType {
 
     public Integer getState() {
         return state;
+    }
+
+    public Production getProduction() {
+        return production;
     }
 
     @Override

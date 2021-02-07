@@ -123,7 +123,7 @@ public class GenerateLRMachine {
                 for (Symbol symbol : follow) {
                     if (action.get(i).containsKey(symbol.toString()))
                         throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                    action.get(i).put(symbol.toString(), TableElementType.createReduce(reduceProductionIndex));
+                    action.get(i).put(symbol.toString(), TableElementType.createReduce(reduceProductionIndex, production.getProduction()));
                 }
             }
 
@@ -310,10 +310,6 @@ class ProductionWithItem {
 
     public boolean itemAtTheEnd() {
         return item == production.getRSymbols().size();
-    }
-
-    public boolean isEpsilonProduction() {
-        return production.getRSymbols().size() != 0 && production.getRSymbols().get(0).isEpsilon();
     }
 
     @Override

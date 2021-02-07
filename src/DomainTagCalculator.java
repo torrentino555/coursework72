@@ -36,12 +36,16 @@ public enum DomainTagCalculator {
             return ")";
         if (name.equals(OpAdd.name()))
             return "+";
+        if (name.equals(OpSub.name()))
+            return "-";
         if (name.equals(OpMul.name()))
             return "*";
+        if (name.equals(OpDiv.name()))
+            return "/";
         if (name.equals(IntegerVal.name()))
             return "IntValue";
         if (name.equals(EOF.name()))
             return "$";
-        return "";
+        return "?";
     }
 }
