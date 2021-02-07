@@ -57,6 +57,6 @@ public enum DomainTagGrammar {
             return "terminalVal";
         if (name.equals(EOF.name()))
             return "$";
-        return "?";
+        return name;
     }
 }

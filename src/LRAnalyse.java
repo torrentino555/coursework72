@@ -33,66 +33,57 @@ public class LRAnalyse {
 //        ));
 //        grammar1.setStartSymbol(E1);
         // Грамматика распознавания грамматики
-        Symbol S = Symbol.createNotTerminal("S");
-        Symbol NT0 = Symbol.createNotTerminal("NT0");
-        Symbol NT = Symbol.createNotTerminal("NT");
-        Symbol NT1 = Symbol.createNotTerminal("NT1");
-        Symbol T0 = Symbol.createNotTerminal("T0");
-        Symbol T = Symbol.createNotTerminal("T");
-        Symbol T1 = Symbol.createNotTerminal("T1");
-        Symbol RS = Symbol.createNotTerminal("RS");
-        Symbol RS1 = Symbol.createNotTerminal("RS1");
-        Symbol R = Symbol.createNotTerminal("R");
-        Symbol R1 = Symbol.createNotTerminal("R1");
-        Symbol R2 = Symbol.createNotTerminal("R2");
-        Symbol R3 = Symbol.createNotTerminal("R3");
-        Symbol A = Symbol.createNotTerminal("A");
+        Symbol S = Symbol.createNonTerminal("P'");
+        Symbol P = Symbol.createNonTerminal("P");
+        Symbol NT = Symbol.createNonTerminal("NT");
+        Symbol T = Symbol.createNonTerminal("T");
+        Symbol RS = Symbol.createNonTerminal("RS");
+        Symbol R = Symbol.createNonTerminal("R");
+        Symbol RSR = Symbol.createNonTerminal("RSR");
+        Symbol RSR1 = Symbol.createNonTerminal("RSR1");
+        Symbol RSR2 = Symbol.createNonTerminal("RSR2");
+        Symbol A = Symbol.createNonTerminal("A");
         grammar1.setProductions(List.of(
-                new Production(S, List.of(NT0)),
-                new Production(NT0, List.of(Symbol.createTerminal(DomainTagGrammar.NonTerminalKeyword.name()), NT)),
+                new Production(S, List.of(P)),
+                new Production(P, List.of(
+                        Symbol.createTerminal(DomainTagGrammar.NonTerminalKeyword.name()),
+                        Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()),
+                        NT,
+                        Symbol.createTerminal(DomainTagGrammar.Semicolon.name()),
+                        Symbol.createTerminal(DomainTagGrammar.TerminalKeyword.name()),
+                        Symbol.createTerminal(DomainTagGrammar.TerminalVal.name()),
+                        T,
+                        Symbol.createTerminal(DomainTagGrammar.Semicolon.name()),
+                        RS,
+                        A
+                )),
                 new Production(NT, List.of(
-                        Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()),
-                        NT1,
-                        Symbol.createTerminal(DomainTagGrammar.Semicolon.name()),
-                        T0
-                )),
-                new Production(NT1, List.of(
                         Symbol.createTerminal(DomainTagGrammar.Comma.name()),
                         Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()),
-                        NT1
+                        NT
                 )),
-                new Production(NT1, List.of(Symbol.EPSILON)),
-                new Production(T0, List.of(Symbol.createTerminal(DomainTagGrammar.TerminalKeyword.name()), T)),
+                new Production(NT, List.of(Symbol.EPSILON)),
                 new Production(T, List.of(
-                        Symbol.createTerminal(DomainTagGrammar.TerminalVal.name()),
-                        T1,
-                        Symbol.createTerminal(DomainTagGrammar.Semicolon.name()),
-                        RS
-                )),
-                new Production(T1, List.of(
                         Symbol.createTerminal(DomainTagGrammar.Comma.name()),
                         Symbol.createTerminal(DomainTagGrammar.TerminalVal.name()),
-                        T1
+                        T
                 )),
-                new Production(T1, List.of(Symbol.EPSILON)),
-                new Production(RS, List.of(R, RS1)),
-                new Production(RS1, List.of(RS)),
-                new Production(RS1, List.of(A)),
+                new Production(T, List.of(Symbol.EPSILON)),
+                new Production(RS, List.of(R, RS)),
+                new Production(RS, List.of(Symbol.EPSILON)),
                 new Production(R, List.of(
                         Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()),
                         Symbol.createTerminal(DomainTagGrammar.Equal.name()),
-                        R1,
-                        R2,
-                        Symbol.createTerminal(DomainTagGrammar.Semicolon.name())
+                        RSR
                 )),
-                new Production(R1, List.of(Symbol.createTerminal(DomainTagGrammar.TerminalVal.name()), R3)),
-                new Production(R1, List.of(Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()),R3)),
-                new Production(R1, List.of(Symbol.createTerminal(DomainTagGrammar.EpsilonKeyword.name()))),
-                new Production(R2, List.of(Symbol.EPSILON)),
-                new Production(R2, List.of(Symbol.createTerminal(DomainTagGrammar.OpOr.name()), R1, R2)),
-                new Production(R3, List.of(Symbol.createTerminal(DomainTagGrammar.TerminalVal.name()), R3)),
-                new Production(R3, List.of(Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()), R3)),
-                new Production(R3, List.of(Symbol.EPSILON)),
+                new Production(RSR, List.of(RSR1, Symbol.createTerminal(DomainTagGrammar.Semicolon.name()))),
+                new Production(RSR, List.of(RSR1, Symbol.createTerminal(DomainTagGrammar.OpOr.name()), RSR2, Symbol.createTerminal(DomainTagGrammar.Semicolon.name()))),
+                new Production(RSR1, List.of(Symbol.createTerminal(DomainTagGrammar.TerminalVal.name()), RSR1)),
+                new Production(RSR1, List.of(Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()), RSR1)),
+                new Production(RSR1, List.of(Symbol.createTerminal(DomainTagGrammar.EpsilonKeyword.name()))),
+                new Production(RSR1, List.of(Symbol.EPSILON)),
+                new Production(RSR2, List.of(RSR1)),
+                new Production(RSR2, List.of(RSR1, Symbol.createTerminal(DomainTagGrammar.OpOr.name()), RSR2)),
                 new Production(A, List.of(
                         Symbol.createTerminal(DomainTagGrammar.AxiomKeyword.name()),
                         Symbol.createTerminal(DomainTagGrammar.NonTerminalVal.name()),
@@ -111,7 +102,8 @@ public class LRAnalyse {
         GrammarLexer lexer = new GrammarLexer(text);
         Node root = LRAnalyse.parse(lexer, generateLRMachine.getAction(), generateLRMachine.getGoTo());
 //        System.out.println("Результат калькулятора: " + Calculator.calculate(root));
-        System.out.println("lol");
+        GrammarExtractor grammarExtractor = new GrammarExtractor();
+        Grammar resultGrammar = grammarExtractor.extract(root);
     }
 
     public static Node parse(LexerInterface lexer, Map<Integer, Map<String, TableElementType>> action, Map<Integer, Map<String, Integer>> goTo) {

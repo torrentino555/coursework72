@@ -24,7 +24,7 @@ public class Symbol {
         return new Symbol(TERMINAL_TYPE, value);
     }
 
-    public static Symbol createNotTerminal(String value) {
+    public static Symbol createNonTerminal(String value) {
         return new Symbol(NOT_TERMINAL_TYPE, value);
     }
 

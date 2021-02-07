@@ -12,10 +12,10 @@ public class FirstAndFollowGenerator {
         Grammar grammar1 = new Grammar();
 
 
-        Symbol S = Symbol.createNotTerminal("S");
-        Symbol E = Symbol.createNotTerminal("E");
-        Symbol E1 = Symbol.createNotTerminal("E1");
-        Symbol N = Symbol.createNotTerminal("N");
+        Symbol S = Symbol.createNonTerminal("S");
+        Symbol E = Symbol.createNonTerminal("E");
+        Symbol E1 = Symbol.createNonTerminal("E1");
+        Symbol N = Symbol.createNonTerminal("N");
         grammar1.setProductions(List.of(
                 new Production(S, List.of(E)),
                 new Production(E, List.of(N, E1)),

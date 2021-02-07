@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Node {
     private List<Node> children = new ArrayList<>();
-    private String notTerminalName;
+    private String nonTerminalName;
     // Инициализируются только у терминалов
     private String tagName;
     private String value;
@@ -17,8 +17,12 @@ public class Node {
         this.value = value;
     }
 
-    public Node(String notTerminalName) {
-        this.notTerminalName = notTerminalName;
+    public Node(String nonTerminalName) {
+        this.nonTerminalName = nonTerminalName;
+    }
+
+    public boolean isTerminal() {
+        return tagName.equals(DomainTagGrammar.TerminalVal.name());
     }
 
     public void addChildren(Node node) {
@@ -27,6 +31,10 @@ public class Node {
 
     public List<Node> getChildren() {
         return children;
+    }
+
+    public Node getChild(int i) {
+        return children.get(i);
     }
 
     public void reverseChildren() {
@@ -46,12 +54,12 @@ public class Node {
         return this;
     }
 
-    public String getNotTerminalName() {
-        return notTerminalName;
+    public String getNonTerminalName() {
+        return nonTerminalName;
     }
 
-    public Node setNotTerminalName(String notTerminalName) {
-        this.notTerminalName = notTerminalName;
+    public Node setNonTerminalName(String nonTerminalName) {
+        this.nonTerminalName = nonTerminalName;
         return this;
     }
 }

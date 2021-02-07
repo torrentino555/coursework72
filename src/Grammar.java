@@ -5,7 +5,6 @@ public class Grammar {
     private Symbol startSymbol;
     private List<Production> productions = new ArrayList<>();
     private Map<Symbol, List<Production>> notTerminalToProductions = new HashMap<>();
-    // Все символы грамматики, пустой, пока не будет вызвана функция calculateDeclarations
     private Set<Symbol> declarations;
 
     public Grammar() {
@@ -16,10 +15,6 @@ public class Grammar {
         this.productions.addAll(grammar.getProductions());
         this.notTerminalToProductions = new HashMap<>(grammar.notTerminalToProductions);
         this.declarations = grammar.declarations;
-    }
-
-    public Production getProduction(Integer index) {
-        return productions.get(index);
     }
 
     public Production getStartProduction() {
@@ -70,6 +65,23 @@ public class Grammar {
 
     public void setStartSymbol(Symbol startSymbol) {
         this.startSymbol = startSymbol;
+    }
+
+    public void addProduction(Production production) {
+        productions.add(production);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grammar grammar = (Grammar) o;
+        return Objects.equals(startSymbol, grammar.startSymbol) && Objects.equals(productions, grammar.productions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startSymbol, productions);
     }
 }
 

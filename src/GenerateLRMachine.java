@@ -15,10 +15,10 @@ public class GenerateLRMachine {
 
     public static void main(String[] args) {
         Grammar grammar1 = new Grammar();
-        Symbol E1 = Symbol.createNotTerminal("E'");
-        Symbol E = Symbol.createNotTerminal("E");
-        Symbol T = Symbol.createNotTerminal("T");
-        Symbol F = Symbol.createNotTerminal("F");
+        Symbol E1 = Symbol.createNonTerminal("E'");
+        Symbol E = Symbol.createNonTerminal("E");
+        Symbol T = Symbol.createNonTerminal("T");
+        Symbol F = Symbol.createNonTerminal("F");
         grammar1.setProductions(List.of(
                 new Production(E1, List.of(E)),
                 new Production(E, List.of(E, Symbol.createTerminal("+"), T)),
@@ -43,7 +43,7 @@ public class GenerateLRMachine {
         buffer.append("    ");
         List<Integer> sizes = new ArrayList<>();
         for (Symbol s : terminals) {
-            Integer size = Math.max(s.toPrettyString().length(), 2);
+            Integer size = Math.max(s.toPrettyString().length(), 3);
             sizes.add(size);
             buffer.append(String.format("%-" + size + "s|", s.toPrettyString()));
         }
