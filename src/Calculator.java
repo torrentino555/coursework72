@@ -10,9 +10,9 @@ public class Calculator {
             String plusName = DomainTagCalculator.OpAdd.name();
             String minusName = DomainTagCalculator.OpSub.name();
 
-            if (plusName.equals(node.getChildren().get(1).getTerminal().getDomainTag().name())) {
+            if (plusName.equals(node.getChildren().get(1).getTagName())) {
                 return leftOperand + rightOperand;
-            } else if (minusName.equals(node.getChildren().get(1).getTerminal().getDomainTag().name())) {
+            } else if (minusName.equals(node.getChildren().get(1).getTagName())) {
                 return leftOperand - rightOperand;
             }
 
@@ -29,9 +29,9 @@ public class Calculator {
             String mulName = DomainTagCalculator.OpMul.name();
             String divName = DomainTagCalculator.OpDiv.name();
 
-            if (mulName.equals(node.getChildren().get(1).getTerminal().getDomainTag().name())) {
+            if (mulName.equals(node.getChildren().get(1).getTagName())) {
                 return leftOperand * rightOperand;
-            } else if (divName.equals(node.getChildren().get(1).getTerminal().getDomainTag().name())) {
+            } else if (divName.equals(node.getChildren().get(1).getTagName())) {
                 return leftOperand / rightOperand;
             }
 
@@ -45,7 +45,7 @@ public class Calculator {
         if (node.getChildren().size() == 3) {
             return parseE(node.getChildren().get(1));
         } else {
-            return Integer.parseInt(node.getChildren().get(0).getTerminal().getValue());
+            return Integer.parseInt(node.getChildren().get(0).getValue());
         }
     }
 }

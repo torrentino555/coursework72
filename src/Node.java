@@ -5,13 +5,16 @@ import java.util.List;
 public class Node {
     private List<Node> children = new ArrayList<>();
     private String notTerminalName;
-    private Token terminal;
+    // Инициализируются только у терминалов
+    private String tagName;
+    private String value;
 
     public Node() {
     }
 
-    public Node(Token terminal) {
-        this.terminal = terminal;
+    public Node(String tagName, String value) {
+        this.tagName = tagName;
+        this.value = value;
     }
 
     public Node(String notTerminalName) {
@@ -30,6 +33,14 @@ public class Node {
         Collections.reverse(this.children);
     }
 
+    public String getTagName() {
+        return tagName;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
     public Node setChildren(List<Node> children) {
         this.children = children;
         return this;
@@ -41,15 +52,6 @@ public class Node {
 
     public Node setNotTerminalName(String notTerminalName) {
         this.notTerminalName = notTerminalName;
-        return this;
-    }
-
-    public Token getTerminal() {
-        return terminal;
-    }
-
-    public Node setTerminal(Token terminal) {
-        this.terminal = terminal;
         return this;
     }
 }

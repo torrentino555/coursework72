@@ -39,25 +39,25 @@ public class GenerateLRMachine {
     public void printActionMap() {
         StringBuilder buffer = new StringBuilder();
         List<Symbol> terminals = grammar.getDeclarations().stream().filter(Symbol::isTerminal).collect(Collectors.toList());
-//        // TODO: удалить, это для отладки
-//        List<Symbol> terminals = new ArrayList<>(List.of(Symbol.createTerminal("id"), Symbol.createTerminal("+"), Symbol.createTerminal("*"), Symbol.createTerminal("("), Symbol.createTerminal(")")));
-//        List<Integer> reverseMap = new ArrayList<>(List.of(0, 4, 3, 5, 1, 2, 8, 7, 6, 11, 10, 9));
-//        //
         terminals.add(Symbol.createEndTerminal());
         buffer.append("    ");
+        List<Integer> sizes = new ArrayList<>();
         for (Symbol s : terminals) {
-            buffer.append(s.toString()).append("  ");
+            Integer size = Math.max(s.toPrettyString().length(), 2);
+            sizes.add(size);
+            buffer.append(String.format("%-" + size + "s|", s.toPrettyString()));
         }
         buffer.append("\n");
         for (int i = 0; i < action.size(); i++) {
-            buffer.append(i > 9 ? i : i + " ").append(": ");
-            for (Symbol s: terminals) {
-                buffer.append(action.get(i).containsKey(s.toString()) ? action.get(i).get(s.toString()).toString() + " " : "   ");
-//                // TODO: удалить, это для отладки
-//                Integer j = reverseMap.get(i);
-//                buffer.append(action.get(j).containsKey(s.toString()) ? action.get(j).get(s.toString()).toString() + " " : "   ");
-//                //
+            int startIndex = buffer.length();
+            buffer.append(String.format("%-2s", i)).append(": ");
+            for (int j = 0; j < terminals.size(); j++) {
+                Symbol s = terminals.get(j);
+                buffer.append(String.format("%-" + sizes.get(j) + "s|", action.get(i).containsKey(s.toString()) ? action.get(i).get(s.toString()).toString() : ""));
             }
+            int endIndex = buffer.length();
+            buffer.append("\n");
+            buffer.append("-".repeat(Math.max(0, endIndex - startIndex)));
             buffer.append("\n");
         }
         System.out.println(buffer.toString());
@@ -66,19 +66,24 @@ public class GenerateLRMachine {
     public void printGoToMap() {
         StringBuilder buffer = new StringBuilder();
         List<Symbol> notTerminals = grammar.getDeclarations().stream().filter(Symbol::isNotTerminal).collect(Collectors.toList());
-//        List<Symbol> notTerminals = new ArrayList<>(List.of(Symbol.createNotTerminal("E"), Symbol.createNotTerminal("T"), Symbol.createNotTerminal("F")));
         buffer.append("    ");
+        List<Integer> sizes = new ArrayList<>();
         for (Symbol s : notTerminals) {
-            buffer.append(s.toString()).append(s.toString().length() == 2 ? " " : "  ");
+            Integer size = Math.max(s.toString().length(), 2);
+            sizes.add(size);
+            buffer.append(String.format("%-" + size + "s|", s.toString()));
         }
         buffer.append("\n");
         for (int i = 0; i < goTo.size(); i++) {
-            buffer.append(i > 9 ? i : i + " ").append(": ");
-            for (Symbol s: notTerminals) {
-                buffer.append(goTo.get(i).containsKey(s.toString()) ?
-                        (goTo.get(i).get(s.toString()) > 9 ? goTo.get(i).get(s.toString()) : goTo.get(i).get(s.toString()) + " ")
-                                + " " : "   ");
+            int startIndex = buffer.length();
+            buffer.append(String.format("%-2s", i)).append(": ");
+            for (int j = 0; j < notTerminals.size(); j++) {
+                Symbol s = notTerminals.get(j);
+                buffer.append(String.format("%-" + sizes.get(j) + "s|", goTo.get(i).containsKey(s.toString()) ? goTo.get(i).get(s.toString()) : ""));
             }
+            int endIndex = buffer.length();
+            buffer.append("\n");
+            buffer.append("-".repeat(Math.max(0, endIndex - startIndex)));
             buffer.append("\n");
         }
         System.out.println(buffer.toString());
@@ -333,14 +338,14 @@ class ProductionWithItem {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(production.getLNotTerminal().toString());
+        stringBuilder.append(production.getLNotTerminal().toPrettyString());
         stringBuilder.append(" -> ");
         for (int i = 0; i < production.getRSymbols().size(); i++) {
             if (item == i) {
                 stringBuilder.append(" .");
             }
             stringBuilder.append(" ");
-            stringBuilder.append(production.getRSymbols().get(i).toString());
+            stringBuilder.append(production.getRSymbols().get(i).toPrettyString());
         }
         if (item == production.getRSymbols().size()) {
             stringBuilder.append(" .");

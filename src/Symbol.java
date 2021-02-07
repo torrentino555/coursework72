@@ -49,9 +49,15 @@ public class Symbol {
         return Objects.hash(type, value);
     }
 
+    // Для использования в генераторе
     @Override
     public String toString() {
         return type.equals(EPSILON_TYPE) ? "EPSILON" : value;
+    }
+
+    // Для красивого вывода
+    public String toPrettyString() {
+        return isEpsilon() ? "EPSILON" : isTerminal() ? DomainTagGrammar.getTerminalViewByTagName(value) : value;
     }
 
     public boolean isTerminal() {

@@ -50,6 +50,9 @@ public class Grammar {
     }
 
     public Set<Symbol> getDeclarations() {
+        if (declarations == null) {
+            calculateDeclarations();
+        }
         return declarations;
     }
 
@@ -89,12 +92,7 @@ class Production {
 
     @Override
     public String toString() {
-        return lNotTerminal.getValue() + " -> " + rSymbols.stream().map(symbol -> {
-            if (symbol.isTerminal()) {
-                return DomainTagCalculator.getTerminalViewByTagName(symbol.getValue());
-            }
-            return symbol.getValue();
-        }).collect(Collectors.joining(" "));
+        return lNotTerminal.toPrettyString() + " -> " + rSymbols.stream().map(Symbol::toPrettyString).collect(Collectors.joining(" "));
     }
 
     public boolean isEpsilonProduction() {
