@@ -1,5 +1,6 @@
 public class Fragment {
-    private Position start, follow;
+    private final Position start;
+    private final Position follow;
 
     public Fragment(Position start, Position follow) {
         this.start = start;

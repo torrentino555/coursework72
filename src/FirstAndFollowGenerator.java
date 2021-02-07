@@ -7,62 +7,6 @@ public class FirstAndFollowGenerator {
     private final Grammar grammar;
     private Symbol followRootOfRecursion;
 
-    public static void main(String[] args) {
-        // Инициализация грамматики
-        Grammar grammar1 = new Grammar();
-
-
-        Symbol S = Symbol.createNonTerminal("S");
-        Symbol E = Symbol.createNonTerminal("E");
-        Symbol E1 = Symbol.createNonTerminal("E1");
-        Symbol N = Symbol.createNonTerminal("N");
-        grammar1.setProductions(List.of(
-                new Production(S, List.of(E)),
-                new Production(E, List.of(N, E1)),
-                new Production(E1, List.of(Symbol.createTerminal(DomainTagCalculator.OpAdd.name()), E)),
-                new Production(N, List.of(Symbol.createTerminal(DomainTagCalculator.IntegerVal.name()))),
-                new Production(E1, List.of(Symbol.EPSILON))
-        ));
-//        grammar1.setProductions(List.of(
-//                new Production(S, List.of(E)),
-//                new Production(E, List.of(T, E1)),
-//                new Production(E1, List.of(Symbol.createTerminal(DomainTagCalculator.OpAdd.name()), T, E1)),
-//                new Production(E1, List.of(Symbol.createTerminal(DomainTagCalculator.OpSub.name()), T, E1)),
-//                new Production(E1, List.of(Symbol.EPSILON)),
-//                new Production(T, List.of(F, T1)),
-//                new Production(T1, List.of(Symbol.createTerminal(DomainTagCalculator.OpMul.name()), F, T1)),
-//                new Production(T1, List.of(Symbol.createTerminal(DomainTagCalculator.OpDiv.name()), F, T1)),
-//                new Production(T1, List.of(Symbol.EPSILON)),
-//                new Production(F, List.of(N)),
-//                new Production(F, List.of(Symbol.createTerminal(DomainTagCalculator.LBracket.name()), E, Symbol.createTerminal(DomainTagCalculator.RBracket.name()))),
-//                new Production(N, List.of(Symbol.createTerminal(DomainTagCalculator.IntegerVal.name())))
-//        ));
-        grammar1.setStartSymbol(S);
-        grammar1.calculateDeclarations();
-
-        FirstAndFollowGenerator generator = new FirstAndFollowGenerator(grammar1);
-        System.out.println("FIRST");
-        System.out.println("S: " + generator.calcFirst(S));
-        System.out.println("E: " + generator.calcFirst(E));
-        System.out.println("E1: " + generator.calcFirst(E1));
-        System.out.println("N: " + generator.calcFirst(N));
-//        System.out.println("E: " + generator.calcFirst(E));
-//        System.out.println("E1: " + generator.calcFirst(E1));
-//        System.out.println("T: " + generator.calcFirst(T));
-//        System.out.println("T1: " + generator.calcFirst(T1));
-//        System.out.println("F: " + generator.calcFirst(F));
-        System.out.println("\nFOLLOW");
-        System.out.println("S: " + generator.calcFollow(S));
-        System.out.println("E: " + generator.calcFollow(E));
-        System.out.println("E1: " + generator.calcFollow(E1));
-        System.out.println("N: " + generator.calcFollow(N));
-//        System.out.println("E: " + generator.calcFollow(E));
-//        System.out.println("E1: " + generator.calcFollow(E1));
-//        System.out.println("T: " + generator.calcFollow(T));
-//        System.out.println("T1: " + generator.calcFollow(T1));
-//        System.out.println("F: " + generator.calcFollow(F));
-    }
-
     public FirstAndFollowGenerator(Grammar grammar) {
         this.grammar = grammar;
     }

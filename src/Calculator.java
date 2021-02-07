@@ -7,12 +7,10 @@ public class Calculator {
         if (node.getChildren().size() == 3) {
             double leftOperand = parseE(node.getChildren().get(0));
             double rightOperand = parseT(node.getChildren().get(2));
-            String plusName = DomainTagCalculator.OpAdd.name();
-            String minusName = DomainTagCalculator.OpSub.name();
 
-            if (plusName.equals(node.getChildren().get(1).getTagName())) {
+            if ("+".equals(node.getChildren().get(1).getLexemeName())) {
                 return leftOperand + rightOperand;
-            } else if (minusName.equals(node.getChildren().get(1).getTagName())) {
+            } else if ("-".equals(node.getChildren().get(1).getLexemeName())) {
                 return leftOperand - rightOperand;
             }
 
@@ -26,12 +24,10 @@ public class Calculator {
         if (node.getChildren().size() == 3) {
             double leftOperand = parseT(node.getChildren().get(0));
             double rightOperand = parseF(node.getChildren().get(2));
-            String mulName = DomainTagCalculator.OpMul.name();
-            String divName = DomainTagCalculator.OpDiv.name();
 
-            if (mulName.equals(node.getChildren().get(1).getTagName())) {
+            if ("*".equals(node.getChildren().get(1).getLexemeName())) {
                 return leftOperand * rightOperand;
-            } else if (divName.equals(node.getChildren().get(1).getTagName())) {
+            } else if ("/".equals(node.getChildren().get(1).getLexemeName())) {
                 return leftOperand / rightOperand;
             }
 

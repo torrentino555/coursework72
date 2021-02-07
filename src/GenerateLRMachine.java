@@ -13,29 +13,6 @@ public class GenerateLRMachine {
 
     }
 
-    public static void main(String[] args) {
-        Grammar grammar1 = new Grammar();
-        Symbol E1 = Symbol.createNonTerminal("E'");
-        Symbol E = Symbol.createNonTerminal("E");
-        Symbol T = Symbol.createNonTerminal("T");
-        Symbol F = Symbol.createNonTerminal("F");
-        grammar1.setProductions(List.of(
-                new Production(E1, List.of(E)),
-                new Production(E, List.of(E, Symbol.createTerminal("+"), T)),
-                new Production(E, List.of(T)),
-                new Production(T, List.of(T, Symbol.createTerminal("*"), F)),
-                new Production(T, List.of(F)),
-                new Production(F, List.of(Symbol.createTerminal("("), E, Symbol.createTerminal(")"))),
-                new Production(F, List.of(Symbol.createTerminal("id")))
-        ));
-        grammar1.setStartSymbol(E1);
-        grammar1.calculateDeclarations();
-
-        GenerateLRMachine generateLRMachine = new GenerateLRMachine(grammar1);
-        generateLRMachine.generateActionAndGoTo();
-
-    }
-
     public void printActionMap() {
         StringBuilder buffer = new StringBuilder();
         List<Symbol> terminals = grammar.getDeclarations().stream().filter(Symbol::isTerminal).collect(Collectors.toList());
@@ -147,6 +124,12 @@ public class GenerateLRMachine {
                 goTo.get(i).put(s.toString(), relations.get(i).get(s));
             }
         }
+
+        if (ProdOrDebug.isDebug) {
+            printActionMap();
+            printGoToMap();
+        }
+        System.out.println("Формирование таблиц ACTION и GOTO успешно завершено.");
     }
 
     public List<ItemsSet> items() {

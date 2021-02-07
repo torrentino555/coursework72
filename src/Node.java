@@ -6,23 +6,16 @@ public class Node {
     private List<Node> children = new ArrayList<>();
     private String nonTerminalName;
     // Инициализируются только у терминалов
-    private String tagName;
+    private String lexemeName;
     private String value;
 
-    public Node() {
-    }
-
-    public Node(String tagName, String value) {
-        this.tagName = tagName;
+    public Node(String lexemeName, String value) {
+        this.lexemeName = lexemeName;
         this.value = value;
     }
 
     public Node(String nonTerminalName) {
         this.nonTerminalName = nonTerminalName;
-    }
-
-    public boolean isTerminal() {
-        return tagName.equals(DomainTagGrammar.TerminalVal.name());
     }
 
     public void addChildren(Node node) {
@@ -41,8 +34,8 @@ public class Node {
         Collections.reverse(this.children);
     }
 
-    public String getTagName() {
-        return tagName;
+    public String getLexemeName() {
+        return lexemeName;
     }
 
     public String getValue() {

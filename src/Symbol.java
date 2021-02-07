@@ -1,7 +1,7 @@
+import java.io.Serializable;
 import java.util.Objects;
 
-// TODO: написать equals и hashCode(для использования в map)
-public class Symbol {
+public class Symbol implements Serializable {
     private static final String TERMINAL_TYPE = "terminal";
     private static final String NOT_TERMINAL_TYPE = "not_terminal";
     private static final String EPSILON_TYPE = "epsilon";
@@ -33,7 +33,7 @@ public class Symbol {
     }
 
     public static Symbol createEndTerminal() {
-        return createTerminal(DomainTagCalculator.EOF.name());
+        return createTerminal(Lexeme.EOF_LEXEME_NAME);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Symbol {
 
     // Для красивого вывода
     public String toPrettyString() {
-        return isEpsilon() ? "EPSILON" : isTerminal() ? DomainTagGrammar.getTerminalViewByTagName(value) : value;
+        return isEpsilon() ? "EPSILON" : value;
     }
 
     public boolean isTerminal() {

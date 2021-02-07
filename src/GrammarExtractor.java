@@ -4,18 +4,20 @@ import java.util.List;
 import java.util.Set;
 
 public class GrammarExtractor {
-    private Grammar grammar = new Grammar();
-    private Set<Symbol> nonTerminals = new HashSet<>();
-    private Set<Symbol> terminals = new HashSet<>();
+    private final Grammar grammar = new Grammar();
+    private final Set<Symbol> nonTerminals = new HashSet<>();
+    private final Set<Symbol> terminals = new HashSet<>();
 
     public GrammarExtractor() {
     }
 
     public  Grammar extract(Node root) {
         parseP(root);
+        // Расширение грамматики, добавление нового стартового символа
         Symbol newStartSymbol = Symbol.createNonTerminal(grammar.getStartSymbol().getValue() + "'");
         grammar.addProduction(new Production(newStartSymbol, List.of(grammar.getStartSymbol())));
         grammar.setStartSymbol(newStartSymbol);
+        System.out.println("Генерация грамматики на основе дерева разбора и расширение грамматики успешно завершено.");
         return grammar;
     }
 
@@ -87,8 +89,7 @@ public class GrammarExtractor {
             return symbols;
         }
 
-        // TODO: терминалы с '' будут кривыми
-        if (node.getChild(0).isTerminal()) {
+        if (node.getChild(0).getLexemeName().equals("terminal-value")) {
             Symbol terminal = Symbol.createTerminal(processTerminal(node.getChild(0).getValue()));
             if (!terminals.contains(terminal)) {
                 throw new Error("В объявлении правой части правила был использован незнакомый терминал: " + terminal.toPrettyString());

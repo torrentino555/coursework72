@@ -1,0 +1,10 @@
+non-terminal-keyword non-terminal
+terminal-keyword terminal
+axiom-keyword axiom
+epsilon-keyword epsilon
+| \|
+::=
+;
+,
+non-terminal-value [A-Z][A-Z0-9]*
+terminal-value ('[^']+')|([a-z][a-zA-Z]*)

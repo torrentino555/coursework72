@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,9 @@ public class Grammar {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Grammar grammar = (Grammar) o;
-        return Objects.equals(startSymbol, grammar.startSymbol) && Objects.equals(productions, grammar.productions);
+        Set<Production> productionSet = new HashSet<>(productions);
+        Set<Production> productionAnotherSet = new HashSet<>(grammar.productions);
+        return Objects.equals(startSymbol, grammar.startSymbol) && Objects.equals(productionSet, productionAnotherSet);
     }
 
     @Override
@@ -85,9 +88,9 @@ public class Grammar {
     }
 }
 
-class Production {
-    private Symbol lNotTerminal;
-    private List<Symbol> rSymbols;
+class Production implements Serializable {
+    private final Symbol lNotTerminal;
+    private final List<Symbol> rSymbols;
 
     public Production(Symbol lNotTerminal, List<Symbol> rSymbols) {
         this.lNotTerminal = lNotTerminal;

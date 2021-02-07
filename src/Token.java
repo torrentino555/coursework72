@@ -1,27 +1,28 @@
+import java.text.MessageFormat;
 import java.util.Objects;
 
 public class Token {
-    private final String domainTagName;
+    private final String lexemeName;
     private Fragment coords;
-    private String value;
+    private final String value;
 
-    public Token(String domainTagName, String value) {
-        this.domainTagName = domainTagName;
+    public Token(String lexemeName, String value) {
+        this.lexemeName = lexemeName;
         this.value = value;
     }
 
-    public Token(String domainTagName, Position start, Position follow) {
-        this.domainTagName = domainTagName;
+    public Token(String lexemeName, Position start, Position follow) {
+        this.lexemeName = lexemeName;
         this.coords = new Fragment(start, follow);
         this.value = this.coords.getFragmentValue();
     }
 
     public static Token createEOFToken() {
-        return new Token(DomainTagCalculator.EOF.name(), DomainTagCalculator.EOF.name());
+        return new Token(Lexeme.EOF_LEXEME_NAME, Lexeme.EOF_LEXEME_NAME);
     }
 
-    public String getDomainTagName() {
-        return domainTagName;
+    public String getLexemeName() {
+        return lexemeName;
     }
 
     public String getValue() {
@@ -30,7 +31,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return domainTagName + " " + coords.toString() + ": " + value;
+        return MessageFormat.format("Токен ''{0}'' {1}: {2}", lexemeName, coords.toString(), value);
     }
 
     @Override
@@ -38,11 +39,11 @@ public class Token {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Token token = (Token) o;
-        return domainTagName.equals(token.domainTagName) && Objects.equals(value, token.value);
+        return lexemeName.equals(token.lexemeName) && Objects.equals(value, token.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(domainTagName, value);
+        return Objects.hash(lexemeName, value);
     }
 }

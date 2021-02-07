@@ -1,12 +1,12 @@
-non-terminal P, NT, T, RS, R, RSR, RSR1, A;
-terminal 'non-terminal-keyword', 'terminal-keyword', 'non-terminal-value', 'terminal-value', 'axiom', 'epsilon', ',', ';', '|', '::=';
+non-terminal P, NT, T, RS, R, RSR, RSR1, RSR2, A;
+terminal 'non-terminal-keyword', 'terminal-keyword', 'non-terminal-value', 'terminal-value', 'axiom-keyword', 'epsilon-keyword', ',', ';', '|', '::=';
 P ::= 'non-terminal-keyword' 'non-terminal-value' NT ';' 'terminal-keyword' 'terminal-value' T ';' RS A;
 NT ::= ',' 'non-terminal-value' NT | epsilon;
 T ::= ',' 'terminal-value' T | epsilon;
 RS ::= R RS | epsilon;
 R ::= 'non-terminal-value' '::=' RSR;
 RSR ::= RSR1 ';' | RSR1 '|' RSR2 ';';
-RSR1 ::= 'terminal-value' RSR1 | 'non-terminal-value' RSR1 | 'epsilon' | epsilon;
+RSR1 ::= 'terminal-value' RSR1 | 'non-terminal-value' RSR1 | 'epsilon-keyword' | epsilon;
 RSR2 ::= RSR1 | RSR1 '|' RSR2;
-A ::= 'axiom' 'non-terminal-value' ';';
+A ::= 'axiom-keyword' 'non-terminal-value' ';';
 axiom P;

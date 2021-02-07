@@ -1,9 +1,12 @@
-class TableElementType {
+import java.io.Serializable;
+import java.util.Objects;
+
+class TableElementType implements Serializable {
     private static final String SHIFT_TYPE = "shift";
     private static final String REDUCE_TYPE = "reduce";
     private static final String ACCEPT_TYPE = "accept";
 
-    private String type;
+    private final String type;
     private Integer state;
     private Production production;
 
@@ -57,15 +60,24 @@ class TableElementType {
     @Override
     public String toString() {
         String r = state == null ? "?" : state.toString();
-//        // TODO: удалить, это для отладки
-//        List<Integer> map = new ArrayList<>(List.of(0, 4, 5, 2, 1, 3, 8, 7, 6, 11, 10, 9));
-//        String r = state == null ? "?" : (type.equals(REDUCE_TYPE) ? state : map.get(state)).toString();
-//        //
         return switch (type) {
             case SHIFT_TYPE -> "s" + r;
             case REDUCE_TYPE -> "r" + r;
             case ACCEPT_TYPE -> "ac";
             default -> "";
         };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TableElementType that = (TableElementType) o;
+        return Objects.equals(type, that.type) && Objects.equals(state, that.state) && Objects.equals(production, that.production);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, state, production);
     }
 }
