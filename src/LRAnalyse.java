@@ -14,29 +14,7 @@ public class LRAnalyse {
         }
 
         Grammar grammar1 = new Grammar();
-//        Symbol S = Symbol.createNotTerminal("S");
-//        Symbol E = Symbol.createNotTerminal("E");
-//        Symbol E1 = Symbol.createNotTerminal("E1");
-//        Symbol T = Symbol.createNotTerminal("T");
-//        Symbol T1 = Symbol.createNotTerminal("T1");
-//        Symbol F = Symbol.createNotTerminal("F");
-//        Symbol N = Symbol.createNotTerminal("N");
-//        grammar1.setProductions(List.of(
-//                new Production(S, List.of(E)),
-//                new Production(E, List.of(T, E1)),
-//                new Production(E1, List.of(Symbol.createTerminal(DomainTagCalculator.OpAdd.name()), T, E1)),
-//                new Production(E1, List.of(Symbol.createTerminal(DomainTagCalculator.OpSub.name()), T, E1)),
-//                new Production(E1, List.of(Symbol.EPSILON)),
-//                new Production(T, List.of(F, T1)),
-//                new Production(T1, List.of(Symbol.createTerminal(DomainTagCalculator.OpMul.name()), F, T1)),
-//                new Production(T1, List.of(Symbol.createTerminal(DomainTagCalculator.OpDiv.name()), F, T1)),
-//                new Production(T1, List.of(Symbol.EPSILON)),
-//                new Production(F, List.of(N)),
-//                new Production(F, List.of(Symbol.createTerminal(DomainTagCalculator.LBracket.name()), E, Symbol.createTerminal(DomainTagCalculator.RBracket.name()))),
-//                new Production(N, List.of(Symbol.createTerminal(DomainTagCalculator.IntegerVal.name())))
-//        ));
-//        grammar1.setStartSymbol(S);
-//        grammar1.calculateDeclarations();
+        // Рабочая грамматика калькулятора
         Symbol E1 = Symbol.createNotTerminal("E'");
         Symbol E = Symbol.createNotTerminal("E");
         Symbol T = Symbol.createNotTerminal("T");
@@ -57,6 +35,8 @@ public class LRAnalyse {
 
         GenerateLRMachine generateLRMachine = new GenerateLRMachine(grammar1);
         generateLRMachine.generateActionAndGoTo();
+        generateLRMachine.printActionMap();
+        generateLRMachine.printGoToMap();
 
         Lexer lexer = new Lexer(text);
         Node root = LRAnalyse.start(lexer, generateLRMachine.getAction(), generateLRMachine.getGoTo());
@@ -84,13 +64,16 @@ public class LRAnalyse {
                 } else if (element.isReducer()) {
                     Production reducerProduction = element.getProduction();
                     Node parentNode = new Node(reducerProduction.getLNotTerminal().getValue());
-                    for (int i = 0; i < reducerProduction.getRSymbols().size(); i++) {
-                        parentNode.addChildren(nodes.pop());
-                        stack.pop();
+                    if (!reducerProduction.isEpsilonProduction()) {
+                        for (int i = 0; i < reducerProduction.getRSymbols().size(); i++) {
+                            parentNode.addChildren(nodes.pop());
+                            stack.pop();
+                        }
                     }
-                    Integer t = stack.peek();
+                    Integer lastState = stack.peek();
+                    parentNode.reverseChildren();
                     nodes.push(parentNode);
-                    stack.push(goTo.get(t).get(reducerProduction.getLNotTerminal().getValue()));
+                    stack.push(goTo.get(lastState).get(reducerProduction.getLNotTerminal().getValue()));
 
                     if (ProdOrDebug.isDebug) {
                         System.out.println(reducerProduction);

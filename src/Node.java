@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Node {
@@ -23,6 +24,10 @@ public class Node {
 
     public List<Node> getChildren() {
         return children;
+    }
+
+    public void reverseChildren() {
+        Collections.reverse(this.children);
     }
 
     public Node setChildren(List<Node> children) {

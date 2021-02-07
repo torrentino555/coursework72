@@ -114,7 +114,7 @@ public class GenerateLRMachine {
 
             // Пункт 2.б
             list = productions.stream().filter(production ->
-                    production.itemAtTheEnd() &&
+                    (production.itemAtTheEnd() || production.isEpsilonProduction()) &&
                             !production.getProduction().getLNotTerminal().equals(grammar.getStartSymbol()))
                     .collect(Collectors.toList());
             for (ProductionWithItem production : list) {
@@ -167,6 +167,7 @@ public class GenerateLRMachine {
                         }
                         if (!newStates.contains(nextI)) {
                             relations.get(i).put(s, newStates.size());
+                            relations.add(new HashMap<>());
                             newStates.add(nextI);
                         } else {
                             relations.get(i).put(s, newStates.indexOf(nextI));
@@ -310,6 +311,10 @@ class ProductionWithItem {
 
     public boolean itemAtTheEnd() {
         return item == production.getRSymbols().size();
+    }
+
+    public boolean isEpsilonProduction() {
+        return production.getRSymbols().size() != 0 && production.getRSymbols().get(0).isEpsilon();
     }
 
     @Override

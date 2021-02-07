@@ -5,8 +5,8 @@ public class Calculator {
 
     private static double parseE(Node node) {
         if (node.getChildren().size() == 3) {
-            double leftOperand = parseE(node.getChildren().get(2));
-            double rightOperand = parseT(node.getChildren().get(0));
+            double leftOperand = parseE(node.getChildren().get(0));
+            double rightOperand = parseT(node.getChildren().get(2));
             String plusName = DomainTagCalculator.OpAdd.name();
             String minusName = DomainTagCalculator.OpSub.name();
 
@@ -24,8 +24,8 @@ public class Calculator {
 
     private static double parseT(Node node) {
         if (node.getChildren().size() == 3) {
-            double leftOperand = parseT(node.getChildren().get(2));
-            double rightOperand = parseF(node.getChildren().get(0));
+            double leftOperand = parseT(node.getChildren().get(0));
+            double rightOperand = parseF(node.getChildren().get(2));
             String mulName = DomainTagCalculator.OpMul.name();
             String divName = DomainTagCalculator.OpDiv.name();
 

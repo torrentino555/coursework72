@@ -45,7 +45,7 @@ public class Grammar {
         declarations = new HashSet<>();
         for (Production production : productions) {
             declarations.add(production.getLNotTerminal());
-            declarations.addAll(production.getRSymbols());
+            declarations.addAll(production.getRSymbols().stream().filter(symbol -> !symbol.isEpsilon()).collect(Collectors.toList()));
         }
     }
 
