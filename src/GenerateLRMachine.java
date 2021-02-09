@@ -7,7 +7,6 @@ public class GenerateLRMachine {
     private final Map<Integer, Map<String, TableElementType>> action = new HashMap<>();
     private final Map<Integer, Map<String, Integer>> goTo = new HashMap<>();
 
-    // На вход подается расширенная грамматика
     public GenerateLRMachine(Grammar grammar) {
         this.grammar = new Grammar(grammar);
 
@@ -30,7 +29,12 @@ public class GenerateLRMachine {
             buffer.append(String.format("%-2s", i)).append(": ");
             for (int j = 0; j < terminals.size(); j++) {
                 Symbol s = terminals.get(j);
-                buffer.append(String.format("%-" + sizes.get(j) + "s|", action.get(i).containsKey(s.toString()) ? action.get(i).get(s.toString()).toString() : ""));
+                Map<String, TableElementType> currentAction = action.get(i);
+                buffer.append(
+                        String.format(
+                                "%-" + sizes.get(j) + "s|",
+                                currentAction.containsKey(s.toString()) ? currentAction.get(s.toString()).toString() : ""
+                        ));
             }
             int endIndex = buffer.length();
             buffer.append("\n");
@@ -56,7 +60,12 @@ public class GenerateLRMachine {
             buffer.append(String.format("%-2s", i)).append(": ");
             for (int j = 0; j < notTerminals.size(); j++) {
                 Symbol s = notTerminals.get(j);
-                buffer.append(String.format("%-" + sizes.get(j) + "s|", goTo.get(i).containsKey(s.toString()) ? goTo.get(i).get(s.toString()) : ""));
+                Map<String, Integer> currentGoto = goTo.get(i);
+                buffer.append(
+                        String.format(
+                                "%-" + sizes.get(j) + "s|",
+                                currentGoto.containsKey(s.toString()) ? currentGoto.get(s.toString()) : ""
+                        ));
             }
             int endIndex = buffer.length();
             buffer.append("\n");
@@ -84,39 +93,32 @@ public class GenerateLRMachine {
             action.put(i, new HashMap<>());
             goTo.put(i, new HashMap<>());
             Set<ProductionWithItem> productions = machine.get(i).getSet();
-            // Пункт 2.а
-            List<ProductionWithItem> list = productions.stream().filter(production -> production.getSymbolAfterPoint().isTerminal()).collect(Collectors.toList());
-            for (ProductionWithItem production : list) {
-                Symbol symbolAfterPoint = production.getSymbolAfterPoint();
-                TableElementType elementType = TableElementType.createShift(relations.get(i).get(symbolAfterPoint));
-                if (action.get(i).containsKey(symbolAfterPoint.toString()))
-                    throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                action.get(i).put(symbolAfterPoint.toString(), elementType);
-            }
 
-            // Пункт 2.б
-            list = productions.stream().filter(production ->
-                    (production.itemAtTheEnd() || production.isEpsilonProduction()) &&
-                            !production.getProduction().getLNotTerminal().equals(grammar.getStartSymbol()))
-                    .collect(Collectors.toList());
-            for (ProductionWithItem production : list) {
-                Integer reduceProductionIndex = grammar.getProductionIndex(production.getProduction());
-                Set<Symbol> follow = firstAndFollowGenerator.calcFollow(production.getProduction().getLNotTerminal());
-                for (Symbol symbol : follow) {
-                    if (action.get(i).containsKey(symbol.toString()))
+            for (ProductionWithItem production : productions) {
+                if (production.getSymbolAfterPoint().isTerminal()) {
+                    Symbol symbolAfterPoint = production.getSymbolAfterPoint();
+                    TableElementType elementType = TableElementType.createShift(relations.get(i).get(symbolAfterPoint));
+                    if (action.get(i).containsKey(symbolAfterPoint.toString()))
                         throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                    action.get(i).put(symbol.toString(), TableElementType.createReduce(reduceProductionIndex, production.getProduction()));
+                    action.get(i).put(symbolAfterPoint.toString(), elementType);
                 }
-            }
 
-            // Пункт 2.в
-            List<ProductionWithItem> ps =
-                    productions.stream().filter(p -> p.getProduction().getLNotTerminal().equals(grammar.getStartSymbol()) && p.itemAtTheEnd())
-                    .collect(Collectors.toList());
-            if (ps.size() > 0) {
-                if (action.get(i).containsKey(Symbol.createEndTerminal().toString()))
-                    throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
-                action.get(i).put(Symbol.createEndTerminal().toString(), TableElementType.createAccept());
+                if ((production.itemAtTheEnd() || production.isEpsilonProduction()) &&
+                        !production.getProduction().getLNotTerminal().equals(grammar.getStartSymbol())) {
+                    Integer reduceProductionIndex = grammar.getProductionIndex(production.getProduction());
+                    Set<Symbol> follow = firstAndFollowGenerator.calcFollow(production.getProduction().getLNotTerminal());
+                    for (Symbol symbol : follow) {
+                        if (action.get(i).containsKey(symbol.toString()))
+                            throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
+                        action.get(i).put(symbol.toString(), TableElementType.createReduce(reduceProductionIndex, production.getProduction()));
+                    }
+                }
+
+                if (production.getProduction().getLNotTerminal().equals(grammar.getStartSymbol()) && production.itemAtTheEnd()) {
+                    if (action.get(i).containsKey(Symbol.createEndTerminal().toString()))
+                        throw new Error("Ошибка, грамматика не принадлежит классу SLR.");
+                    action.get(i).put(Symbol.createEndTerminal().toString(), TableElementType.createAccept());
+                }
             }
 
             List<Symbol> keySet = relations.get(i).keySet().stream().filter(Symbol::isNotTerminal).collect(Collectors.toList());
@@ -210,129 +212,5 @@ public class GenerateLRMachine {
 
     public Map<Integer, Map<String, Integer>> getGoTo() {
         return goTo;
-    }
-}
-
-class ItemsSet {
-    private Set<ProductionWithItem> set;
-
-    public ItemsSet() {
-        set = new HashSet<>();
-    }
-
-    public ItemsSet(Production production) {
-        set = new HashSet<>(List.of(new ProductionWithItem(production)));
-    }
-
-    public ItemsSet(Set<ProductionWithItem> set) {
-        this.set = set;
-    }
-
-    public ItemsSet(ItemsSet itemsSet) {
-        this.set = new HashSet<>(itemsSet.getSet());
-    }
-
-    public Set<ProductionWithItem> getSet() {
-        return set;
-    }
-
-    public void setSet(Set<ProductionWithItem> set) {
-        this.set = set;
-    }
-
-    public void addProduction(ProductionWithItem production) {
-        this.set.add(production);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append("\nСостояние автомата {\n");
-        set.stream()
-                .sorted(Comparator.comparing(production -> production.getProduction().getLNotTerminal().toString()))
-                .forEach(production -> result.append("\t").append(production).append("\n"));
-        result.append("}\n");
-        return result.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ItemsSet that = (ItemsSet) o;
-        return Objects.equals(set, that.set);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(set);
-    }
-}
-
-class ProductionWithItem {
-    private final Production production;
-    private int item = 0;
-
-    public ProductionWithItem(Production production) {
-        this.production = production;
-    }
-
-    public ProductionWithItem(Production production, int item) {
-        this.production = production;
-        this.item = item;
-    }
-
-    public Production getProduction() {
-        return production;
-    }
-
-    public Symbol getSymbolAfterPoint() {
-        return itemAtTheEnd() ? Symbol.EPSILON : production.getRSymbols().get(item);
-    }
-
-    public ProductionWithItem incrementItem() {
-        if (!itemAtTheEnd()) {
-            return new ProductionWithItem(production, item + 1);
-        }
-        return this;
-    }
-
-    public boolean itemAtTheEnd() {
-        return item == production.getRSymbols().size();
-    }
-
-    public boolean isEpsilonProduction() {
-        return production.getRSymbols().size() != 0 && production.getRSymbols().get(0).isEpsilon();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProductionWithItem that = (ProductionWithItem) o;
-        return item == that.item && Objects.equals(production, that.production);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(production, item);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(production.getLNotTerminal().toPrettyString());
-        stringBuilder.append(" -> ");
-        for (int i = 0; i < production.getRSymbols().size(); i++) {
-            if (item == i) {
-                stringBuilder.append(" .");
-            }
-            stringBuilder.append(" ");
-            stringBuilder.append(production.getRSymbols().get(i).toPrettyString());
-        }
-        if (item == production.getRSymbols().size()) {
-            stringBuilder.append(" .");
-        }
-        return stringBuilder.toString();
     }
 }

@@ -14,7 +14,7 @@ public class Lexer {
             return Token.createEOFToken();
         }
 
-        position = position.skipWhitespaces();
+        position = Position.skipWhitespaces(position);
         String tail = position.getTail();
 
         Position start, end;

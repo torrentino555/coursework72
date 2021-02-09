@@ -1,6 +1,5 @@
 import java.util.Map;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 public class LRAnalyse {
     public static Node parse(Lexer lexer, Map<Integer, Map<String, TableElementType>> action, Map<Integer, Map<String, Integer>> goTo) {

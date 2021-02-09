@@ -51,10 +51,10 @@ public class Position  {
         return text.substring(index);
     }
 
-    public Position skipWhitespaces() {
-        Position result = new Position(this);
+    public static Position skipWhitespaces(Position p) {
+        Position result = new Position(p);
         while (result.isWhitespace()) {
-            result = next();
+            result = result.next();
         }
         return result;
     }
@@ -79,16 +79,6 @@ public class Position  {
         return (text.charAt(index) == '\n');
     }
 
-    public boolean isDigit() {
-        return !isEOF() && text.charAt(index) >= '0' && text.charAt(index) <= '9';
-    }
-
-    public boolean isLetter() {
-        return Character.isLetter(text.charAt(index));
-    }
-
-
-
     public Position next() {
         Position p = new Position(this);
         if (!p.isEOF()) {
@@ -103,14 +93,6 @@ public class Position  {
                 p.pos++;
             }
             p.index++;
-        }
-        return p;
-    }
-
-    public Position prev() {
-        Position p = new Position(this);
-        if (!p.isEOF()) {
-            p.pos--;
         }
         return p;
     }
