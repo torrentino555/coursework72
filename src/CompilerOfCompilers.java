@@ -4,11 +4,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-public class Program2 {
+public class CompilerOfCompilers {
     public static void main(String[] args) {
-        if (args.length != 3) {
+        if (args.length != 2) {
             System.out.println("Ваши аргументы: " + Arrays.toString(args));
-            System.out.println("Программа запущена с неверным кол-вом аргументов, пример аргументов: grammar.txt lexemesForGrammar.txt ActionAndGotoGenerateByGrammarOfGrammar.dat");
+            System.out.println("Программа запущена с неверным кол-вом аргументов, пример аргументов: grammar.txt ActionAndGotoGenerateByGrammarOfGrammar.dat");
             return;
         }
 
@@ -25,7 +25,7 @@ public class Program2 {
         }
 
         // Чтение лексем из файла
-        List<Lexeme> lexemes = ParseLexemes.parseLexemes(args[1]);
+        List<Lexeme> lexemes = ParseLexemes.parseLexemes("resources/lexemesForGrammar.txt");
         Lexer lexer = new Lexer(text, lexemes);
 
         // Запуск SLR анализатора
@@ -40,6 +40,6 @@ public class Program2 {
         generateLRMachine.generateActionAndGoTo();
 
         // Сериализация таблиц ACTION и GOTO
-        SerializeHelper.serializeActionAndGotoInFile(args[2], generateLRMachine);
+        SerializeHelper.serializeActionAndGotoInFile(args[1], generateLRMachine);
     }
 }

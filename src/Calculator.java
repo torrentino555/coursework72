@@ -1,47 +1,31 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
 public class Calculator {
-    public static double calculate(Node root) {
-        return parseE(root);
-    }
+    public static void main(String[] args) {
+        // Чтение сгенерированных таблиц ACTION и GOTO из файла
+        ActionAndGoto actionAndGoto = SerializeHelper.deserializeAndGetActionAndGotoFromFile("resources/ActionAndGotoGeneratedByCalculatorGrammar.dat");
 
-    private static double parseE(Node node) {
-        if (node.getChildren().size() == 3) {
-            double leftOperand = parseE(node.getChildren().get(0));
-            double rightOperand = parseT(node.getChildren().get(2));
-
-            if ("+".equals(node.getChildren().get(1).getLexemeName())) {
-                return leftOperand + rightOperand;
-            } else if ("-".equals(node.getChildren().get(1).getLexemeName())) {
-                return leftOperand - rightOperand;
-            }
-
-            throw new Error("Ошибка работы калькулятора!");
-        } else {
-            return parseT(node.getChildren().get(0));
+        // Чтение файла, который будем анализировать
+        String text;
+        try {
+            text = new String(Files.readAllBytes(Paths.get("resources/inCalc.txt")));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
         }
-    }
 
-    private static double parseT(Node node) {
-        if (node.getChildren().size() == 3) {
-            double leftOperand = parseT(node.getChildren().get(0));
-            double rightOperand = parseF(node.getChildren().get(2));
+        // Чтение лексем из файла
+        List<Lexeme> lexemes = ParseLexemes.parseLexemes("resources/lexemesForCalculator.txt");
+        Lexer lexer = new Lexer(text, lexemes);
 
-            if ("*".equals(node.getChildren().get(1).getLexemeName())) {
-                return leftOperand * rightOperand;
-            } else if ("/".equals(node.getChildren().get(1).getLexemeName())) {
-                return leftOperand / rightOperand;
-            }
+        // Запуск SLR анализатора
+        Node root = LRAnalyse.parse(lexer, actionAndGoto.getAction(), actionAndGoto.getGoTo());
 
-            throw new Error("Ошибка работы калькулятора!");
-        } else {
-            return parseF(node.getChildren().get(0));
-        }
-    }
-
-    private static double parseF(Node node) {
-        if (node.getChildren().size() == 3) {
-            return parseE(node.getChildren().get(1));
-        } else {
-            return Integer.parseInt(node.getChildren().get(0).getValue());
-        }
+        // Вычисление результата калькулятором
+        double result = CalculatorExecutor.calculate(root);
+        System.out.println("Результат вычислений: " + result);
     }
 }

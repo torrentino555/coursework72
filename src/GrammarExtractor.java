@@ -108,13 +108,6 @@ public class GrammarExtractor {
         return symbols;
     }
 
-    public static String processTerminal(String rowTerminalValue) {
-        if (rowTerminalValue.startsWith("'") && rowTerminalValue.endsWith("'")) {
-            return rowTerminalValue.substring(1, rowTerminalValue.length() - 1);
-        }
-        return rowTerminalValue;
-    }
-
     private void parseRSR2(Node node, Symbol lNonTerminal) {
         List<Symbol> rSymbols = parseRSR1(node.getChild(0));
         grammar.addProduction(new Production(lNonTerminal, rSymbols));
@@ -130,5 +123,12 @@ public class GrammarExtractor {
             throw new Error("В объявлении 'axiom' используется незнакомый не терминал: " + startSymbol.toPrettyString());
         }
         grammar.setStartSymbol(startSymbol);
+    }
+
+    public static String processTerminal(String rowTerminalValue) {
+        if (rowTerminalValue.startsWith("'") && rowTerminalValue.endsWith("'")) {
+            return rowTerminalValue.substring(1, rowTerminalValue.length() - 1);
+        }
+        return rowTerminalValue;
     }
 }

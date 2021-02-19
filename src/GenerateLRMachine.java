@@ -84,7 +84,7 @@ public class GenerateLRMachine {
     }
 
     public void generateActionAndGoTo() {
-        List<ItemsSet> machine = items();
+        List<ItemsSet> machine = generateItems();
         FirstAndFollowGenerator firstAndFollowGenerator = new FirstAndFollowGenerator(grammar);
         if (ProdOrDebug.isDebug)
             System.out.println(printItems(machine));
@@ -134,7 +134,7 @@ public class GenerateLRMachine {
         System.out.println("Формирование таблиц ACTION и GOTO успешно завершено.");
     }
 
-    public List<ItemsSet> items() {
+    public List<ItemsSet> generateItems() {
         ItemsSet basicState = new ItemsSet(grammar.getStartProduction());
         List<ItemsSet> states = new ArrayList<>(List.of(closure(basicState)));
 

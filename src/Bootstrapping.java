@@ -3,7 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class Program1 {
+public class Bootstrapping {
     public static void main(String[] args) {
         // Грамматика, написанная вручную
         Grammar grammar = new Grammar();

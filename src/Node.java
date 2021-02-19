@@ -42,17 +42,7 @@ public class Node {
         return value;
     }
 
-    public Node setChildren(List<Node> children) {
-        this.children = children;
-        return this;
-    }
-
     public String getNonTerminalName() {
         return nonTerminalName;
-    }
-
-    public Node setNonTerminalName(String nonTerminalName) {
-        this.nonTerminalName = nonTerminalName;
-        return this;
     }
 }
