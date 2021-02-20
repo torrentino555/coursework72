@@ -95,6 +95,6 @@ public class Bootstrapping {
         generateLRMachine1.generateActionAndGoTo();
 
         // Сериализация таблиц ACTION и GOTO
-        SerializeHelper.serializeActionAndGotoInFile("resources/ActionAndGotoGenerateByGrammarOfGrammar.dat", generateLRMachine);
+        SerializeHelper.serializeActionAndGotoInFile("resources/ActionAndGotoGenerateByGrammarOfGrammar.dat", generateLRMachine1);
     }
 }
